@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111315">
+<title>Sound Board</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#111315;--panel:#1b1e21;--panel2:#23272b;--text:#f3f3f3;--muted:#a9afb5;--line:#343a40;--danger:#8d2e2e}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+button,input{font:inherit}.app{width:100%;max-width:480px;margin:0 auto;min-height:100vh;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 28px)}
+header{display:flex;align-items:end;justify-content:space-between;gap:12px;padding:4px 2px 14px}h1{margin:0;font-size:24px;letter-spacing:.01em}.header-note,.status{font-size:12px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;position:sticky;top:0;z-index:10;background:rgba(17,19,21,.96);padding:8px 0;backdrop-filter:blur(8px)}
+.tab{border:1px solid var(--line);background:#171a1d;color:#cfd4d8;border-radius:12px;padding:12px 6px;font-weight:700;font-size:14px;touch-action:manipulation}.tab.active{background:#efefef;color:#111;border-color:#efefef}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.panel-title h2{margin:0;font-size:18px}.panel-title .status{text-align:right}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sound{min-height:88px;border:1px solid #3a4046;border-radius:14px;background:var(--panel2);color:#fff;font-size:17px;font-weight:750;padding:14px 10px;box-shadow:0 2px 0 #0b0c0e;touch-action:manipulation}.sound:active{transform:translateY(1px)}.sound.playing{outline:2px solid #e8e8e8}.sound .emoji{display:block;font-size:30px;margin-bottom:6px}
+.volume{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.volume-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}.volume-head span:last-child{font-variant-numeric:tabular-nums}input[type=range]{width:100%;height:40px;margin:0;accent-color:#f2f2f2;touch-action:pan-x}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.control{min-height:52px;border:1px solid var(--line);border-radius:13px;background:#1b1f23;color:#fff;font-size:15px;font-weight:700;touch-action:manipulation}.control.danger{background:var(--danger);border-color:#a34848}.screen[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><h1>Sound Board</h1><div class="status" id="globalStatus">準備完了</div></div><div class="header-note">スマホ操作用</div></header>
+<nav class="tabs" aria-label="カテゴリ">
+<button class="tab active" data-target="bgm" type="button">BGM</button>
+<button class="tab" data-target="se" type="button">効果音</button>
+<button class="tab" data-target="voice" type="button">音声</button>
+</nav>
+
+<section class="panel screen" id="bgm">
+<div class="panel-title"><h2>BGM</h2><span class="status">効果音・音声と同時再生可</span></div>
+<div class="grid" id="bgmGrid">
+<button class="sound bgm-btn" data-key="bgm1" type="button">BGM 1</button><button class="sound bgm-btn" data-key="bgm2" type="button">BGM 2</button>
+<button class="sound bgm-btn" data-key="bgm3" type="button">BGM 3</button><button class="sound bgm-btn" data-key="bgm4" type="button">BGM 4</button>
+<button class="sound bgm-btn" data-key="bgm5" type="button">BGM 5</button><button class="sound bgm-btn" data-key="bgm6" type="button">BGM 6</button>
+<button class="sound bgm-btn" data-key="bgm7" type="button">BGM 7</button><button class="sound bgm-btn" data-key="bgm8" type="button">BGM 8</button>
+</div>
+<div class="volume"><div class="volume-head"><span>BGM 音量</span><span id="bgmVolumeText">100%</span></div><input id="bgmVolume" type="range" min="0" max="100" value="100" step="1" aria-label="BGM音量"></div>
+<div class="controls"><button class="control" id="stopBgm" type="button">BGM停止</button><button class="control danger stop-all" type="button">全停止</button></div>
+</section>
+
+<section class="panel screen" id="se" hidden>
+<div class="panel-title"><h2>効果音</h2><span class="status">BGMを止めずに再生</span></div>
+<div class="grid">
+<button class="sound se-btn" data-key="tiger" type="button"><span class="emoji">🐯</span>虎の鳴き声</button>
+<button class="sound se-btn" data-key="magic" type="button"><span class="emoji">✨</span>魔法</button>
+<button class="sound se-btn" data-key="picon" type="button"><span class="emoji">🔔</span>ピコン！</button>
+<button class="sound se-btn" data-key="shock" type="button"><span class="emoji">😱</span>ガーン！</button>
+<button class="sound se-btn" data-key="phone" type="button"><span class="emoji">📱</span>スマホ通知</button>
+<button class="sound se-btn" data-key="siren" type="button"><span class="emoji">🚨</span>警報</button>
+<button class="sound se-btn" data-key="police" type="button"><span class="emoji">🚓</span>警察サイレン</button>
+<button class="sound se-btn" data-key="car" type="button"><span class="emoji">🚗</span>車の通過</button>
+</div>
+<div class="volume"><div class="volume-head"><span>効果音 音量</span><span id="seVolumeText">100%</span></div><input id="seVolume" type="range" min="0" max="100" value="100" step="1" aria-label="効果音音量"></div>
+<div class="controls"><button class="control" id="stopSe" type="button">効果音停止</button><button class="control danger stop-all" type="button">全停止</button></div>
+</section>
+
+<section class="panel screen" id="voice" hidden>
+<div class="panel-title"><h2>トランシーバー音声</h2><span class="status">BGMを止めずに再生</span></div>
+<div class="grid"><button class="sound voice-btn" data-key="bob" type="button">ボブ</button><button class="sound voice-btn" data-key="shinma" type="button">しんま</button></div>
+<div class="volume"><div class="volume-head"><span>音声 音量</span><span id="voiceVolumeText">100%</span></div><input id="voiceVolume" type="range" min="0" max="100" value="100" step="1" aria-label="音声音量"></div>
+<div class="controls"><button class="control" id="stopVoice" type="button">音声停止</button><button class="control danger stop-all" type="button">全停止</button></div>
+</section>
+</div>
+<script>
+"use strict";
+const ROOTS={
+ zootopia:"https://raw.githubusercontent.com/haru081116-spec/Zootopia-003/main/",
+ se:"https://raw.githubusercontent.com/haru081116-spec/-/main/",
+ voice:"https://raw.githubusercontent.com/haru081116-spec/Record/main/"
+};
+// 指定: 旧2→新1, 旧3→新2 ... 旧7→新6, 旧1→新7, 旧8→新8
+const bgmFiles={bgm1:"song2.mp3",bgm2:"song3.mp3",bgm3:"song4.mp3",bgm4:"song5.mp3",bgm5:"song6.mp3",bgm6:"song7.mp3",bgm7:"song1.mp3",bgm8:"song8.mp3"};
+const seFiles={tiger:"tiger.mp3",magic:"magic.mp3",picon:"picon.mp3",shock:"shock.mp3",phone:"phone.mp3",siren:"siren.mp3",police:"police.mp3",car:"car.mp3"};
+const voiceFiles={bob:"bob.mp3",shinma:"shinma.mp3"};
+const bgm={},seSounds={},voices={};
+let volumes={bgm:1,se:1,voice:1};
+function buildAudio(map,root,target,group){for(const [key,file] of Object.entries(map)){const a=new Audio(root+encodeURIComponent(file));a.preload="metadata";a.volume=volumes[group];target[key]=a}}
+buildAudio(bgmFiles,ROOTS.zootopia,bgm,"bgm");buildAudio(seFiles,ROOTS.se,seSounds,"se");buildAudio(voiceFiles,ROOTS.voice,voices,"voice");
+function status(text){document.getElementById("globalStatus").textContent=text}
+function rewind(a){a.pause();try{a.currentTime=0}catch(_){}}
+function stopGroup(group){const bank=group==="bgm"?bgm:group==="se"?seSounds:voices;Object.values(bank).forEach(rewind);document.querySelectorAll(`.${group}-btn`).forEach(b=>b.classList.remove("playing"))}
+function stopAll(){stopGroup("bgm");stopGroup("se");stopGroup("voice");status("停止しました")}
+function setVolume(group,percent){const v=Math.max(0,Math.min(100,Number(percent)))/100;volumes[group]=v;const bank=group==="bgm"?bgm:group==="se"?seSounds:voices;Object.values(bank).forEach(a=>a.volume=v);document.getElementById(group+"VolumeText").textContent=Math.round(v*100)+"%"}
+async function playExclusive(group,key,button){const bank=group==="bgm"?bgm:voices;stopGroup(group);const a=bank[key];a.volume=volumes[group];try{a.currentTime=0;await a.play();button.classList.add("playing");status(button.textContent.trim()+" 再生中")}catch(e){status("再生できませんでした。もう一度タップしてください")}}
+async function playEffect(key,button){const base=seSounds[key];const a=base.cloneNode(true);a.volume=volumes.se;a.preload="auto";button.classList.add("playing");a.addEventListener("ended",()=>button.classList.remove("playing"),{once:true});a.addEventListener("pause",()=>button.classList.remove("playing"),{once:true});seSounds[key]=a;try{await a.play();status(button.textContent.trim()+" 再生中")}catch(e){status("再生できませんでした。もう一度タップしてください")}}
+document.querySelectorAll(".tab").forEach(tab=>tab.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t===tab));document.querySelectorAll(".screen").forEach(s=>s.hidden=s.id!==tab.dataset.target)}));
+document.querySelectorAll(".bgm-btn").forEach(b=>b.addEventListener("click",()=>playExclusive("bgm",b.dataset.key,b)));
+document.querySelectorAll(".se-btn").forEach(b=>b.addEventListener("click",()=>playEffect(b.dataset.key,b)));
+document.querySelectorAll(".voice-btn").forEach(b=>b.addEventListener("click",()=>playExclusive("voice",b.dataset.key,b)));
+["bgm","se","voice"].forEach(g=>document.getElementById(g+"Volume").addEventListener("input",e=>setVolume(g,e.target.value)));
+document.getElementById("stopBgm").addEventListener("click",()=>{stopGroup("bgm");status("BGM停止")});document.getElementById("stopSe").addEventListener("click",()=>{stopGroup("se");status("効果音停止")});document.getElementById("stopVoice").addEventListener("click",()=>{stopGroup("voice");status("音声停止")});document.querySelectorAll(".stop-all").forEach(b=>b.addEventListener("click",stopAll));
+Object.values(bgm).forEach(a=>a.addEventListener("ended",()=>document.querySelectorAll(".bgm-btn").forEach(b=>b.classList.remove("playing"))));Object.values(voices).forEach(a=>a.addEventListener("ended",()=>document.querySelectorAll(".voice-btn").forEach(b=>b.classList.remove("playing"))));
+setVolume("bgm",100);setVolume("se",100);setVolume("voice",100);
+</script>
+</body>
+</html>
